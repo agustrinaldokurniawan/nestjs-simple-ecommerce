@@ -1,14 +1,17 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
-  NotFoundException,
   Param,
   Post,
+  Put,
+  Query,
 } from '@nestjs/common';
 import { CreateProductDto } from './create-product.dto';
 import { ProductService } from './product.service';
 import { Product } from './product.schema';
+import { UpdateProductDto } from './update-product.dto';
 
 @Controller('product')
 export class ProductController {
@@ -26,14 +29,21 @@ export class ProductController {
     return this.productService.findAll();
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const product = await this.productService.findOne(id);
+  @Get()
+  async findOne(@Query('productId') id) {
+    return this.productService.findOne(id);
+  }
 
-    if (!product) {
-      throw new NotFoundException("Couldn't find the product.");
-    }
+  @Put()
+  async updateProduct(
+    @Query('productId') id,
+    @Body() updateProductDto: UpdateProductDto,
+  ) {
+    return this.productService.update(id, updateProductDto);
+  }
 
-    return product;
+  @Delete()
+  async deleteProduct(@Query('productId') id) {
+    return this.productService.deleteOne(id);
   }
 }
