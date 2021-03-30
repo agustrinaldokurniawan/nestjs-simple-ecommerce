@@ -3,22 +3,23 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
   Post,
   Put,
   Query,
+  UploadedFile,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateProductDto } from './create-product.dto';
 import { ProductService } from './product.service';
-import { Product } from './product.schema';
 import { UpdateProductDto } from './update-product.dto';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import {
-  ApiBody,
-  ApiOperation,
-  ApiProperty,
-  ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
+  FileFieldsInterceptor,
+  FileInterceptor,
+  FilesInterceptor,
+} from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 
 @Controller('product')
 @ApiTags('Product')
@@ -26,11 +27,26 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post()
+  @UseInterceptors(
+    FilesInterceptor('images', 5, {
+      storage: diskStorage({
+        destination: './files/images/products',
+        filename: (req, file, cb) => {
+          const fileNameSplit = file.originalname.split('.');
+          const fileExt = fileNameSplit[fileNameSplit.length - 1];
+          cb(null, `${Date.now()}.${fileExt}`);
+        },
+      }),
+    }),
+  )
   @ApiOperation({ summary: 'Post new Product' })
-  async createProduct(@Body() createProductDto: CreateProductDto) {
-    await this.productService.create(createProductDto);
+  async createProduct(
+    @Body() createProductDto: CreateProductDto,
+    @UploadedFiles() images,
+  ) {
+    const product = await this.productService.create(createProductDto, images);
 
-    return { message: 'Create product success.' };
+    return product;
   }
 
   @Get('/all')
@@ -62,4 +78,17 @@ export class ProductController {
   async deleteProduct(@Query('productId') id) {
     return this.productService.deleteOne(id);
   }
+
+  // @Post('/file')
+  // @UseInterceptors(
+  //   FileFieldsInterceptor([
+  //     {
+  //       name: 'image',
+  //       maxCount: 5,
+  //     },
+  //   ]),
+  // )
+  // async uploadFiles(@UploadedFiles() files) {
+  //   return { files, message: 'File' };
+  // }
 }

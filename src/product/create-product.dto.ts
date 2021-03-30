@@ -8,10 +8,11 @@ export class CreateProductDto {
   readonly name: string;
 
   @ApiProperty({
-    example: `image uri product`,
-    description: 'image uri of new product',
+    example: `[imageOne, imagetwo]`,
+    description: 'images of new product',
+    isArray: true,
   })
-  readonly image: string;
+  readonly images: [];
 
   @ApiProperty({
     example: `description product`,

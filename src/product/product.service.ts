@@ -12,8 +12,11 @@ export class ProductService {
     private readonly productModel: Model<ProductDocument>,
   ) {}
 
-  async create(createProductDto: CreateProductDto) {
-    const createdProduct = new this.productModel(createProductDto);
+  async create(createProductDto: CreateProductDto, images: any) {
+    const createdProduct = new this.productModel({
+      ...createProductDto,
+      images: [...images],
+    });
     return createdProduct.save();
   }
 

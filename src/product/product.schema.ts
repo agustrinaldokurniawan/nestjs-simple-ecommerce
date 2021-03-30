@@ -8,8 +8,8 @@ export class Product {
   @Prop()
   name: string;
 
-  @Prop()
-  image: string;
+  @Prop([])
+  images: [];
 
   @Prop()
   description: string;

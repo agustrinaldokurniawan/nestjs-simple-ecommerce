@@ -1,11 +1,8 @@
-import { ApiOperation, ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateProductDto {
   @ApiProperty({ example: 'update name', description: 'new name of product' })
   readonly name: string;
-
-  @ApiProperty({ example: 'update link', description: 'new link of product' })
-  readonly image: string;
 
   @ApiProperty({
     example: 'update description',
